@@ -1,3 +1,8 @@
+---
+layout: default
+title: Privacy Policy
+---
+
 # Privacy Policy — Fuksia for Gmail
 
 **Last Updated: October 21, 2026**
