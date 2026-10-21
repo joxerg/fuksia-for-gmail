@@ -202,6 +202,18 @@
     color: #000 !important;
   }
 
+  /* ---------- Iframes de Google dentro de Gmail ----------
+     Google marca sus widgets (cuadrícula de apps, menú de la cuenta) y los paneles laterales
+     con color-scheme: light, y dentro de un iframe el navegador toma ese valor como la
+     preferencia del sistema: allí "prefers-color-scheme: dark" no se cumplía y Fuksia no se
+     activaba. Se les devuelve el esquema oscuro. */
+  html body :is(iframe[src*="ogs.google.com"], iframe:not([src]), iframe[src="about:blank"],
+                iframe[src*="calendar.google.com"], iframe[src*="keep.google.com"],
+                iframe[src*="tasks.google.com"], iframe[src*="contacts.google.com"],
+                iframe[src*="chat.google.com"]) {
+    color-scheme: dark !important;
+  }
+
   /* ---------- Compatibilidad ---------- */
   /* Extensión "Inbox When Ready": su franja de mensajes es blanca. Su regla gana incluso a
      un selector con id (probado en Gmail: con especificidad 1,0,3 seguía blanca), así que

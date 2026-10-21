@@ -13,8 +13,14 @@
     {
       "matches": ["https://mail.google.com/*"],
       "css": ["fuksia.css"],
-      "js": ["fuksia.js"],
       "run_at": "document_start"
+    },
+    {
+      "matches": ["https://mail.google.com/*"],
+      "js": ["fuksia.js"],
+      "run_at": "document_start",
+      "all_frames": true,
+      "match_about_blank": true
     },
     {
       "matches": [
@@ -22,7 +28,8 @@
         "https://keep.google.com/*",
         "https://tasks.google.com/*",
         "https://contacts.google.com/*",
-        "https://chat.google.com/*"
+        "https://chat.google.com/*",
+        "https://ogs.google.com/*"
       ],
       "js": ["fuksia.js"],
       "run_at": "document_start",

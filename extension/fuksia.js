@@ -21,6 +21,10 @@
 
   // Side-panel frames do not get fuksia.css (it would also hit those apps in their own
   // tabs), so they receive the base palette from here.
+  // Only the side-panel apps get a painted page background. The apps grid (ogs.google.com)
+  // and the account menu (an about:blank frame the Google bar writes) are rounded cards on
+  // a transparent page; painting it would show square corners.
+  const TRANSPARENT_WIDGET = !/^(?:calendar|keep|tasks|contacts|chat)\.google\.com$/.test(location.hostname);
   if (!isTop) {
     const base = document.createElement('style');
     base.id = 'fuksia-base';
@@ -33,7 +37,7 @@
       --gm3-sys-color-on-primary:#3b0a17!important;--gm3-sys-color-primary-container:#5c1a2c!important;
       --gm3-sys-color-on-primary-container:#ffd9e0!important;--gm3-sys-color-secondary-container:#4a2530!important;
       --gm3-sys-color-on-secondary-container:#ffd9e0!important}
-      html,body{background-color:#1b1b1c!important;color:#e3e3e3}}`;
+      ${TRANSPARENT_WIDGET ? '' : 'html,body{background-color:#1b1b1c!important;color:#e3e3e3}'}}`;
     document.documentElement.appendChild(base);
   }
   const OVERRIDE_CLASS = 'fuksia-override';
