@@ -122,7 +122,12 @@
       const chroma = (Math.max(c[0], c[1], c[2]) - Math.min(c[0], c[1], c[2])) / 255;
       if (chroma < 0.1) s = 0;
       else if (h >= 195 && h <= 240 && chroma >= 0.2) h = ACCENT_HUE;
-      l = LIGHTNESS[role](l);
+      // Translucent dark fills are state layers (hover, focus, pressed): on a light page they
+      // darken a little. Darkened again they vanish on a dark page, so they become light
+      // veils of the same strength instead, as Material's dark theme does. Stronger dark
+      // fills (dialog scrims, from ~0.3 up) must stay dark, hence the alpha cap.
+      if (role === 'bg' && c[3] <= 0.2 && l < 0.5) l = 1 - l;
+      else l = LIGHTNESS[role](l);
       // Very saturated pastels would glow once darkened; tone them down a little.
       if (role === 'bg' && s > 0.6) s = 0.6;
       const [r, g, b] = hslToRgb(h, s, l);
