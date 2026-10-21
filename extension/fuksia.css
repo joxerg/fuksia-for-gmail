@@ -1,0 +1,210 @@
+/* Fuksia for Gmail — Copyright (c) 2026 BURU labs — MIT License.
+   Tema oscuro sin invertir la página: Gmail pinta casi toda su interfaz con las variables
+   de color de Material 3 (--gm3-sys-color-*), así que aquí se redefinen con una paleta
+   oscura y fucsia. Las zonas antiguas de Gmail que llevan el color fijo se corrigen abajo,
+   una a una. Los colores son reales: lo que se escribe es lo que se ve.
+   Solo actúa con el modo oscuro del sistema. */
+
+@media (prefers-color-scheme: dark) {
+
+  :root {
+    /* ---------- Paleta Fuksia (cambia aquí los colores base) ---------- */
+    --fx-accent: #D85A74;          /* rosa base */
+    --fx-accent-light: #EFBAC5;    /* rosa base mezclado 42 % con blanco */
+    --fx-accent-strong: #F28FA6;   /* rosa para texto y iconos sobre oscuro */
+    --fx-bg: #131314;              /* fondo general */
+    --fx-surface: #1b1b1c;         /* paneles (lista, menú) */
+    --fx-surface-2: #222224;
+    --fx-surface-3: #2a2a2d;
+    --fx-surface-4: #333337;
+    --fx-text: #e3e3e3;
+    --fx-text-muted: #a9abae;
+    --fx-line: #3a3a3e;
+
+    color-scheme: dark !important;
+    /* Casillas, botones de opción y barras de progreso nativas (página de Ajustes). */
+    accent-color: var(--fx-accent);
+
+    /* ---------- Material 3 (usado por la interfaz moderna de Gmail) ---------- */
+    --gm3-sys-color-background: var(--fx-bg) !important;
+    --gm3-sys-color-on-background: var(--fx-text) !important;
+    --gm3-sys-color-surface: var(--fx-bg) !important;
+    --gm3-sys-color-surface-dim: var(--fx-bg) !important;
+    --gm3-sys-color-surface-bright: var(--fx-surface-4) !important;
+    --gm3-sys-color-surface-container-lowest: #0e0e0f !important;
+    --gm3-sys-color-surface-container-low: var(--fx-surface) !important;
+    --gm3-sys-color-surface-container: var(--fx-surface-2) !important;
+    --gm3-sys-color-surface-container-high: var(--fx-surface-3) !important;
+    --gm3-sys-color-surface-container-highest: var(--fx-surface-4) !important;
+    --gm3-sys-color-surface-variant: #44474a !important;
+    --gm3-sys-color-on-surface: var(--fx-text) !important;
+    --gm3-sys-color-on-surface-rgb: 227, 227, 227 !important;
+    --gm3-sys-color-on-surface-variant: #c4c7c5 !important;
+    --gm3-sys-color-inverse-surface: #e3e3e3 !important;
+    --gm3-sys-color-inverse-on-surface: #303030 !important;
+    --gm3-sys-color-outline: #8e918f !important;
+    --gm3-sys-color-outline-variant: #444746 !important;
+    --gm3-sys-color-shadow: #000 !important;
+    --gm3-sys-color-scrim: #000 !important;
+
+    --gm3-sys-color-primary: var(--fx-accent-strong) !important;
+    --gm3-sys-color-on-primary: #3b0a17 !important;
+    --gm3-sys-color-primary-container: #5c1a2c !important;
+    --gm3-sys-color-on-primary-container: #ffd9e0 !important;
+    --gm3-sys-color-primary-fixed: #ffd9e0 !important;
+    --gm3-sys-color-primary-fixed-dim: var(--fx-accent-strong) !important;
+    --gm3-sys-color-on-primary-fixed: #3b0a17 !important;
+    --gm3-sys-color-on-primary-fixed-variant: #5c1a2c !important;
+    --gm3-sys-color-inverse-primary: #a8324e !important;
+
+    --gm3-sys-color-secondary: #e7b3c0 !important;
+    --gm3-sys-color-on-secondary: #44212b !important;
+    --gm3-sys-color-secondary-container: #4a2530 !important;
+    --gm3-sys-color-on-secondary-container: #ffd9e0 !important;
+    --gm3-sys-color-secondary-fixed: #ffd9e0 !important;
+    --gm3-sys-color-secondary-fixed-dim: #e7b3c0 !important;
+
+    --gm3-sys-color-tertiary: #c2c9ff !important;
+    --gm3-sys-color-on-tertiary: #1a2470 !important;
+    --gm3-sys-color-tertiary-container: #323c89 !important;
+    --gm3-sys-color-on-tertiary-container: #dfe0ff !important;
+
+    --gm3-sys-color-error: #f2b8b5 !important;
+    --gm3-sys-color-on-error: #601410 !important;
+    --gm3-sys-color-error-container: #8c1d18 !important;
+    --gm3-sys-color-on-error-container: #f9dedc !important;
+  }
+
+  html, body {
+    background-color: var(--fx-bg) !important;
+    color: var(--fx-text);
+  }
+
+  /* Sin "html body" delante: con combinador de descendiente esta regla encarecía mucho
+     el recálculo de estilos (medido en Arrosa). */
+  ::selection {
+    background-color: var(--fx-accent) !important;
+    color: #fff !important;
+  }
+
+  /* ---------- Diseño Fuksia ----------
+     Las reglas llevan "html body" y !important porque el CSS de una extensión entra en la
+     cascada antes que el de la página. */
+
+  /* Logo de Gmail: Google publica una variante para fondo oscuro. */
+  html body img[src*="logo_gmail_lockup_default"] {
+    content: image-set(url("https://ssl.gstatic.com/ui/v1/icons/mail/rfr/logo_gmail_lockup_dark_1x_r7.png") 1x,
+                       url("https://ssl.gstatic.com/ui/v1/icons/mail/rfr/logo_gmail_lockup_dark_2x_r7.png") 2x) !important;
+  }
+
+  /* Compose: solo contorno rosa al 70 %, texto y lápiz en rosa claro. */
+  html body .T-I.T-I-KE.L3 {
+    background: transparent !important;
+    border: 1.5px solid rgba(216, 90, 116, 0.7) !important;
+    color: var(--fx-accent-light) !important;
+    box-shadow: none !important;
+  }
+  html body .T-I.T-I-KE.L3:is(:hover, :focus-visible, .T-I-JW) {
+    background-color: rgba(216, 90, 116, 0.13) !important;
+    border-color: var(--fx-accent) !important;
+  }
+  html body .T-I.T-I-KE.L3::before {
+    background-image: none !important;
+    background-color: var(--fx-accent-light) !important;
+    filter: none !important;
+    -webkit-mask: url("https://www.gstatic.com/images/icons/material/system_gm/1x/create_black_20dp.png") 50% 50% / 20px auto no-repeat !important;
+    mask: url("https://www.gstatic.com/images/icons/material/system_gm/1x/create_black_20dp.png") 50% 50% / 20px auto no-repeat !important;
+  }
+
+  /* Elemento activo del menú lateral: tinte rosa al 13 %, texto rosa claro, icono rosa. */
+  html body .aim .TO.nZ {
+    background-color: rgba(216, 90, 116, 0.13) !important;
+    box-shadow: none !important;
+  }
+  html body .aim .TO.nZ:is(:hover, .NQ) {
+    background-color: rgba(216, 90, 116, 0.2) !important;
+  }
+  html body .aim .TO.nZ :is(.nU, .nU a, .J-Ke.n0, .bsU) {
+    color: var(--fx-accent-light) !important;
+  }
+  /* El icono cambia con la sección; brightness(0) lo deja negro y el resto lo lleva a #D85A74. */
+  html body .aim .TO.nZ .qj {
+    filter: brightness(0) saturate(100%) invert(40%) sepia(43%) saturate(4130%) hue-rotate(325deg) brightness(110%) contrast(69%) !important;
+  }
+
+  /* Lista: no leídos en rosa con barra lateral, leídos atenuados, mismo fondo para todos. */
+  html body tr.zA:is(.zE, .yO):not(.x7):not(:hover) {
+    background-color: var(--fx-bg) !important;
+  }
+  html body tr.zA:hover {
+    background-color: rgba(216, 90, 116, 0.08) !important;
+  }
+  html body tr.zA.x7:not(:hover) {
+    background-color: rgba(216, 90, 116, 0.16) !important;
+  }
+  html body tr.zA.zE > td:first-child {
+    box-shadow: inset 4px 0 0 #f75b89 !important;
+  }
+  html body tr.zA.zE :is(.yW, .yW span, .bog, .bqe) {
+    color: #f75b89 !important;
+    font-weight: 700 !important;
+  }
+  html body tr.zA.zE :is(.xW, .xW span) {
+    color: var(--fx-text) !important;
+    font-weight: 700 !important;
+  }
+  html body tr.zA.yO :is(.yW, .yW span, .bog, .bqe, .y2, .xW, .xW span) {
+    color: var(--fx-text-muted) !important;
+    font-weight: 400 !important;
+  }
+  /* Barra del cursor (fila en la que estás): rosa sutil, distinto del de los no leídos. */
+  html body tr.zA > td.PE::before {
+    background-color: #9c4468 !important;
+  }
+
+  /* Botón Send y su flecha de programar envío. */
+  html body .T-I.T-I-atl {
+    background-color: var(--fx-accent) !important;
+    color: #fff !important;
+  }
+  html body .T-I.T-I-atl:is(:focus, :active, .T-I-JW) {
+    box-shadow: 0 0 0 3px rgba(216, 90, 116, 0.35) !important;
+  }
+  /* Icono "Schedule send": PNG azul girado a rosa. */
+  html body .J-N.yr .J-N-JX {
+    filter: hue-rotate(125deg) saturate(1.3) !important;
+  }
+
+  /* Enlace "Unsubscribe" de la cabecera del mensaje. */
+  html body .Ca {
+    color: var(--fx-accent-strong) !important;
+  }
+
+  /* ---------- Cuerpo de los mensajes ----------
+     Los emails traen su propio diseño (casi siempre sobre blanco) en estilos en línea que
+     no se pueden remapear con fiabilidad. Se invierte solo ese bloque, con un gris de base
+     que al invertirse coincide con el fondo (#ececeb -> #131314), y se devuelven sus
+     imágenes a los colores reales. Es un único filtro por mensaje abierto. */
+  /* El editor de redactar y responder (.Am.Al.editable) recibe el mismo trato: las firmas
+     traen fondos y colores en línea. */
+  html body :is(.a3s, .Am.Al.editable) {
+    background-color: #ececeb !important;
+    color: #1f1f1f;
+    filter: invert(1) hue-rotate(180deg) !important;
+  }
+  html body :is(.a3s, .Am.Al.editable) :is(img, video, canvas, picture, svg, [style*="background-image"], [style*="url("]) {
+    filter: invert(1) hue-rotate(180deg) !important;
+  }
+  /* Dentro de esos bloques la selección también se invierte: #ea6c86 y negro se ven como
+     #D85A74 y blanco. */
+  :is(.a3s, .Am.Al.editable) ::selection {
+    background-color: #ea6c86 !important;
+    color: #000 !important;
+  }
+
+  /* ---------- Compatibilidad ---------- */
+  /* Extensión "Inbox When Ready": su franja de mensajes es blanca. */
+  html body [id^="iwr_wrap"] {
+    background-color: transparent !important;
+  }
+}
