@@ -203,15 +203,16 @@
   }
 
   /* ---------- Compatibilidad ---------- */
-  /* Extensión "Inbox When Ready": su franja de mensajes es blanca. Su CSS usa selectores de
-     id, así que hace falta un id en el selector para ganarle (especificidad 1,0,2). */
-  html body :is(#iwr_wrap_inbox_messages, #iwr_wrap_inbox_messages div) {
+  /* Extensión "Inbox When Ready": su franja de mensajes es blanca. Su regla gana incluso a
+     un selector con id (probado en Gmail: con especificidad 1,0,3 seguía blanca), así que
+     el id se repite para subir a 2,0,x. */
+  html body :is(#iwr_wrap_inbox_messages#iwr_wrap_inbox_messages, #iwr_wrap_inbox_messages#iwr_wrap_inbox_messages div) {
     background-color: transparent !important;
     background-image: none !important;
     border-color: var(--fx-line) !important;
     box-shadow: none !important;
   }
-  html body :is(#iwr_wrap_inbox_messages, #iwr_wrap_inbox_messages p, #iwr_wrap_inbox_messages span) {
+  html body :is(#iwr_wrap_inbox_messages#iwr_wrap_inbox_messages, #iwr_wrap_inbox_messages#iwr_wrap_inbox_messages :is(p, span)) {
     color: var(--fx-text-muted) !important;
   }
 }
