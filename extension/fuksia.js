@@ -288,5 +288,62 @@
     });
   });
 
+  /* ---------- Workspace logo ----------
+   * Organizations upload their logo as an image with a white background (Workspace does not
+   * keep transparency). On a dark header that white block glares and makes the logo's colors
+   * look washed out. The logo is redrawn once with its white turned into transparency
+   * ("color to alpha": edge pixels get their true ink color back, not a lighter blend) and
+   * shown instead of the original, in dark mode only. The image file itself is not changed.
+   */
+  const LOGO_SELECTOR = 'img[src*="/ac/images/logo"]';
+
+  const whiteToAlpha = (data) => {
+    for (let i = 0; i < data.length; i += 4) {
+      const r = data[i] / 255, g = data[i + 1] / 255, b = data[i + 2] / 255;
+      const alpha = 1 - Math.min(r, g, b);
+      if (alpha <= 0.002) {
+        data[i + 3] = 0;
+        continue;
+      }
+      // Undo the blend with white: c = (c - (1 - alpha)) / alpha
+      data[i] = Math.round(((r - 1 + alpha) / alpha) * 255);
+      data[i + 1] = Math.round(((g - 1 + alpha) / alpha) * 255);
+      data[i + 2] = Math.round(((b - 1 + alpha) / alpha) * 255);
+      data[i + 3] = Math.round(alpha * data[i + 3]);
+    }
+  };
+
+  const restyleLogo = async (img) => {
+    const src = img.currentSrc || img.src;
+    const blob = await (await fetch(src, { credentials: 'include' })).blob();
+    const bitmap = await createImageBitmap(blob);
+    const canvas = new OffscreenCanvas(bitmap.width, bitmap.height);
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(bitmap, 0, 0);
+    const pixels = ctx.getImageData(0, 0, bitmap.width, bitmap.height);
+    whiteToAlpha(pixels.data);
+    ctx.putImageData(pixels, 0, 0);
+    const url = await new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result);
+      canvas.convertToBlob({ type: 'image/png' }).then((png) => reader.readAsDataURL(png));
+    });
+    const style = document.createElement('style');
+    style.className = OVERRIDE_CLASS;
+    style.media = darkQuery.matches ? 'all' : 'not all';
+    style.textContent = `html body ${LOGO_SELECTOR}{content:url("${url}")!important}`;
+    document.documentElement.appendChild(style);
+  };
+
+  const findLogo = (tries = 0) => {
+    const img = document.querySelector(LOGO_SELECTOR);
+    if (img && img.complete) {
+      restyleLogo(img).catch(() => {});
+    } else if (tries < 40) {
+      setTimeout(() => findLogo(tries + 1), 500);
+    }
+  };
+
   start();
+  if (isTop) findLogo();
 })();
