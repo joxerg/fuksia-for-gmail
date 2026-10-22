@@ -47,13 +47,15 @@
   const ACCENT_HUE = 348;   // hue of #D85A74
   // Google encodes the tone in icon file names: nv700, p900, black, grey600... are dark,
   // single-color glyphs drawn for a light background.
-  const MONOCHROME_ICON = /gstatic\.com\/[^"')]*icons\/[^"')]*_(?:nv\d{3}|p900|black|grey\d{3}|gm_grey)_/;
+  // The search box suggestions use a grey sprite (cloudsearch qicons) with no tone token.
+  const MONOCHROME_ICON = /gstatic\.com\/[^"')]*icons\/[^"')]*_(?:nv\d{3}|p900|black|grey\d{3}|gm_grey)_|gstatic\.com\/cloudsearch\/[^"')]*\/qicons/;
 
   /* ---------- Color parsing ---------- */
 
   const NAMED = { white: [255, 255, 255, 1], black: [0, 0, 0, 1] };
   const COLOR_RE = /#[0-9a-f]{3,8}\b|rgba?\([^)]*\)|\b(?:white|black)\b/gi;
-  const HAS_COLOR = /#[0-9a-f]{3,8}\b|rgba?\(|\b(?:white|black)\b/i;
+  const SHORTHAND = /^(?:background|outline|column-rule|text-decoration|border(?:-(?:top|right|bottom|left|block|inline)(?:-(?:start|end))?)?(?:-color)?)$/;
+  const HAS_COLOR =/#[0-9a-f]{3,8}\b|rgba?\(|\b(?:white|black)\b/i;
 
   const parseColor = (text) => {
     const s = text.trim().toLowerCase();
@@ -173,6 +175,23 @@
           if (!value || !HAS_COLOR.test(value)) continue;
           const mapped = mapValue(value, role);
           if (mapped !== value) decl += `${prop}:${mapped}${st.getPropertyPriority(prop) ? ' !important' : ''};`;
+        }
+        // A shorthand holding a var() (background: var(--x, #fff)) is kept by the CSSOM as
+        // a pending substitution: its longhands read back empty above. Remap it from the
+        // declaration text instead, keeping the shorthand.
+        if (st.cssText.includes('var(')) {
+          for (const part of st.cssText.split(';')) {
+            const colon = part.indexOf(':');
+            if (colon < 0) continue;
+            const prop = part.slice(0, colon).trim();
+            if (!SHORTHAND.test(prop)) continue;
+            let value = part.slice(colon + 1).trim();
+            const important = /!important$/.test(value);
+            if (important) value = value.replace(/\s*!important$/, '');
+            if (!value.includes('var(') || !HAS_COLOR.test(value)) continue;
+            const mapped = mapValue(value, roleOf(prop));
+            if (mapped !== value) decl += `${prop}:${mapped}${important ? ' !important' : ''};`;
+          }
         }
         // Gmail's UI glyphs are dark single-tone PNG sprites; flip them to light. Colored
         // artwork (logos, avatars, label dots) has no dark-tone token and is left alone.
