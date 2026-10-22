@@ -110,6 +110,7 @@
   const cache = new Map();
 
   const mapColor = (text, role) => {
+    if (!LIGHTNESS[role]) return text;
     const key = role + text;
     let out = cache.get(key);
     if (out !== undefined) return out;
@@ -153,8 +154,8 @@
     }
     if (prop === 'background-color' || prop === 'background-image' || prop === 'background') return 'bg';
     if (prop === 'color' || prop === 'fill' || prop === 'stroke' || prop === 'caret-color' ||
-        prop === 'text-decoration-color' || prop === '-webkit-text-fill-color') return 'fg';
-    if (prop.startsWith('border') || prop.startsWith('outline') || prop === 'column-rule-color') return 'border';
+        prop.startsWith('text-decoration') || prop === '-webkit-text-fill-color') return 'fg';
+    if (prop.startsWith('border') || prop.startsWith('outline') || prop.startsWith('column-rule')) return 'border';
     return null;
   };
 
@@ -189,7 +190,9 @@
             const important = /!important$/.test(value);
             if (important) value = value.replace(/\s*!important$/, '');
             if (!value.includes('var(') || !HAS_COLOR.test(value)) continue;
-            const mapped = mapValue(value, roleOf(prop));
+            const role = roleOf(prop);
+            if (!role) continue;
+            const mapped = mapValue(value, role);
             if (mapped !== value) decl += `${prop}:${mapped}${important ? ' !important' : ''};`;
           }
         }
