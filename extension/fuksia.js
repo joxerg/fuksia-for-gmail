@@ -54,6 +54,19 @@
 
   const NAMED = { white: [255, 255, 255, 1], black: [0, 0, 0, 1] };
   const COLOR_RE = /#[0-9a-f]{3,8}\b|rgba?\([^)]*\)|\b(?:white|black)\b/gi;
+  // .../material/system_gm/1x/chevron_left_black_20dp.png -> ..._white_20dp.png
+  const SYSTEM_DARK_ICON = /(gstatic\.com\/images\/icons\/material\/system_gm\/[^"')]*?_)(?:black|grey\d{3}|gm_grey)(_\d+dp\.png)/g;
+  // Returns the declarations that swap a rule's dark system icons for their white variant.
+  const whiteVariant = (st) => {
+    let out = '';
+    for (const prop of ['background-image', 'content']) {
+      const value = st.getPropertyValue(prop);
+      if (!value || !value.includes('system_gm')) continue;
+      const swapped = value.replace(SYSTEM_DARK_ICON, '$1white$2');
+      if (swapped !== value) out += `${prop}:${swapped}${st.getPropertyPriority(prop) ? ' !important' : ''};`;
+    }
+    return out;
+  };
   const SHORTHAND = /^(?:background|outline|column-rule|text-decoration|border(?:-(?:top|right|bottom|left|block|inline)(?:-(?:start|end))?)?(?:-color)?)$/;
   const HAS_COLOR =/#[0-9a-f]{3,8}\b|rgba?\(|\b(?:white|black)\b/i;
 
@@ -257,6 +270,16 @@
             const mapped = mapValue(value, role);
             if (mapped !== value) decl += `${prop}:${mapped}${important ? ' !important' : ''};`;
           }
+        }
+        // Material system icons come in an official white variant with the same name. Using
+        // it is better than flipping the element with a filter, which would also flip the
+        // element's own background (a dark button turned into a light grey square).
+        const swapped = whiteVariant(st);
+        if (swapped) {
+          decl += swapped;
+          if (!st.filter) decl += 'filter:none;';
+          if (decl) out.push(`${sel}{${decl}}`);
+          continue;
         }
         // Gmail's UI glyphs are dark single-tone PNG sprites; flip them to light. Colored
         // artwork (logos, avatars, label dots) has no dark-tone token and is left alone.
