@@ -145,12 +145,68 @@
 
   const mapValue = (value, role) => value.replace(COLOR_RE, (m) => mapColor(m, role));
 
+  /* ---------- Custom properties with obfuscated names ----------
+   * Gmail holds ~3,000 colors in custom properties with compiled names (--eNKeTe), so the
+   * name says nothing about whether the color is a background or a text. The role is
+   * learned from how each one is used instead: a variable read inside background-color is
+   * a background. Definitions met before any usage is known are parked and their
+   * stylesheet is converted again once a usage turns up in a later stylesheet.
+   */
+  const VAR_REF = /var\(\s*(--[\w-]+)/g;
+  const varUsage = new Map();
+  const parkedVars = new Map();   // variable name -> stylesheets that defined it without a role
+
+  const usageRole = (name) => {
+    const u = varUsage.get(name);
+    if (!u) return null;
+    let best = null, n = 0;
+    for (const role of ['bg', 'fg', 'border']) if (u[role] > n) { best = role; n = u[role]; }
+    return best;
+  };
+
+  const noteUsage = (value, role, learned) => {
+    if (!role || !value.includes('var(')) return;
+    for (const m of value.matchAll(VAR_REF)) {
+      let u = varUsage.get(m[1]);
+      if (!u) {
+        u = { bg: 0, fg: 0, border: 0 };
+        varUsage.set(m[1], u);
+      }
+      if (!u.bg && !u.fg && !u.border && learned) learned.add(m[1]);
+      u[role]++;
+    }
+  };
+
+  const scanUsage = (rules, learned) => {
+    for (const rule of rules) {
+      if (rule instanceof CSSStyleRule) {
+        const st = rule.style;
+        for (let i = 0; i < st.length; i++) {
+          const prop = st[i];
+          // A variable defined from another (--a: var(--b, #fff)) passes its role on.
+          noteUsage(st.getPropertyValue(prop), roleOf(prop), learned);
+        }
+        if (st.cssText.includes('var(')) {
+          for (const part of st.cssText.split(';')) {
+            const colon = part.indexOf(':');
+            if (colon < 0) continue;
+            const prop = part.slice(0, colon).trim();
+            if (prop.startsWith('--')) continue;
+            noteUsage(part.slice(colon + 1), roleOf(prop), learned);
+          }
+        }
+      } else if (rule.cssRules) {
+        scanUsage(rule.cssRules, learned);
+      }
+    }
+  };
+
   const roleOf = (prop) => {
     if (prop.startsWith('--')) {
       if (/(^|-)on-|text|icon|foreground|fg/.test(prop)) return 'fg';
       if (/outline|border|divider|stroke/.test(prop)) return 'border';
       if (/surface|background|container|bg|fill|scrim/.test(prop)) return 'bg';
-      return null;
+      return usageRole(prop);
     }
     if (prop === 'background-color' || prop === 'background-image' || prop === 'background') return 'bg';
     if (prop === 'color' || prop === 'fill' || prop === 'stroke' || prop === 'caret-color' ||
@@ -171,9 +227,15 @@
         for (let i = 0; i < st.length; i++) {
           const prop = st[i];
           const role = roleOf(prop);
-          if (!role) continue;
           const value = st.getPropertyValue(prop);
           if (!value || !HAS_COLOR.test(value)) continue;
+          if (!role) {
+            if (prop.startsWith('--') && currentNode) {
+              if (!parkedVars.has(prop)) parkedVars.set(prop, new Set());
+              parkedVars.get(prop).add(currentNode);
+            }
+            continue;
+          }
           const mapped = mapValue(value, role);
           if (mapped !== value) decl += `${prop}:${mapped}${st.getPropertyPriority(prop) ? ' !important' : ''};`;
         }
@@ -257,9 +319,22 @@
     if (rules) writeCompanion(node, rules);
   };
 
+  let currentNode = null;
+  const scanned = new WeakSet();
+
   const writeCompanion = (node, rules) => {
+    const learned = new Set();
+    if (!scanned.has(node)) {
+      scanUsage(rules, learned);
+      scanned.add(node);
+    }
+    currentNode = node;
     const out = [];
-    convertRules(rules, out);
+    try {
+      convertRules(rules, out);
+    } finally {
+      currentNode = null;
+    }
     let companion = companions.get(node);
     if (!out.length) {
       if (companion) companion.remove();
@@ -274,6 +349,15 @@
     const css = out.join('\n');
     if (companion.textContent !== css) companion.textContent = css;
     if (node.nextSibling !== companion) node.after(companion);
+    // Stylesheets that defined a variable whose role was only learned now get redone.
+    const again = new Set();
+    for (const name of learned) {
+      const nodes = parkedVars.get(name);
+      if (!nodes) continue;
+      nodes.forEach((n) => { if (n !== node) again.add(n); });
+      parkedVars.delete(name);
+    }
+    again.forEach((n) => { if (n.isConnected) processSheet(n); });
   };
 
   const handleNode = (node) => {
@@ -304,7 +388,21 @@
   });
 
   const start = () => {
-    document.querySelectorAll('style, link[rel~="stylesheet"]').forEach(handleNode);
+    // Learn variable roles from every stylesheet already present before converting any,
+    // so most definitions find their role on the first pass.
+    const nodes = [...document.querySelectorAll('style, link[rel~="stylesheet"]')];
+    for (const node of nodes) {
+      if (isOwn(node) || inMessage(node)) continue;
+      try {
+        if (node.sheet) {
+          scanUsage(node.sheet.cssRules);
+          scanned.add(node);
+        }
+      } catch (e) {
+        // cross-origin: scanned when fetched
+      }
+    }
+    nodes.forEach(handleNode);
     observer.observe(document.documentElement, { childList: true, subtree: true, characterData: true });
   };
 
