@@ -67,6 +67,8 @@
     }
     return out;
   };
+  // Longhands the companions write. Each one is repeated for every Gmail rule declaring it.
+  const MANAGED = /^(?:background-color|background-image|color|fill|stroke|caret-color|outline-color|text-decoration-color|-webkit-text-fill-color|column-rule-color|border-(?:top|right|bottom|left|block-start|block-end|inline-start|inline-end)-color|filter)$/;
   const SHORTHAND = /^(?:background|outline|column-rule|text-decoration|border(?:-(?:top|right|bottom|left|block|inline)(?:-(?:start|end))?)?(?:-color)?)$/;
   const HAS_COLOR =/#[0-9a-f]{3,8}\b|rgba?\(|\b(?:white|black)\b/i;
 
@@ -239,9 +241,18 @@
         let decl = '';
         for (let i = 0; i < st.length; i++) {
           const prop = st[i];
-          const role = roleOf(prop);
           const value = st.getPropertyValue(prop);
-          if (!value || !HAS_COLOR.test(value)) continue;
+          if (!value) continue;
+          const role = roleOf(prop);
+          const important = st.getPropertyPriority(prop) ? ' !important' : '';
+          if (!HAS_COLOR.test(value)) {
+            // Companions sit after Gmail's whole stylesheet, so a companion of an early rule
+            // would beat a later Gmail rule that resets the same property (transparent,
+            // inherit, another icon...). Repeating those declarations as they are keeps
+            // Gmail's own order between its rules.
+            if (MANAGED.test(prop)) decl += `${prop}:${value}${important};`;
+            continue;
+          }
           if (!role) {
             if (prop.startsWith('--') && currentNode) {
               if (!parkedVars.has(prop)) parkedVars.set(prop, new Set());
@@ -250,7 +261,7 @@
             continue;
           }
           const mapped = mapValue(value, role);
-          if (mapped !== value) decl += `${prop}:${mapped}${st.getPropertyPriority(prop) ? ' !important' : ''};`;
+          if (mapped !== value || MANAGED.test(prop)) decl += `${prop}:${mapped}${important};`;
         }
         // A shorthand holding a var() (background: var(--x, #fff)) is kept by the CSSOM as
         // a pending substitution: its longhands read back empty above. Remap it from the

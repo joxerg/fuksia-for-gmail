@@ -175,6 +175,12 @@
     filter: hue-rotate(125deg) saturate(1.3) !important;
   }
 
+  /* Selector de fecha (programar envío, posponer): sábado y domingo con un sombreado sutil.
+     Gmail define ese gris pero lo anula con una regla posterior; aquí se mantiene. */
+  html body .J-JB-KA-JB:is(.J-JB-KA-a6O-Zj, .J-JB-KA-a6O-Zq) {
+    background-color: rgb(26, 26, 26) !important;
+  }
+
   /* Enlace "Unsubscribe" de la cabecera del mensaje. */
   html body .Ca {
     color: var(--fx-accent-strong) !important;
