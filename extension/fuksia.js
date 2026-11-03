@@ -47,8 +47,9 @@
   const ACCENT_HUE = 348;   // hue of #D85A74
   // Google encodes the tone in icon file names: nv700, p900, black, grey600... are dark,
   // single-color glyphs drawn for a light background.
-  // The search box suggestions use a grey sprite (cloudsearch qicons) with no tone token.
-  const MONOCHROME_ICON = /gstatic\.com\/[^"')]*icons\/[^"')]*_(?:nv\d{3}|p900|black|grey\d{3}|gm_grey)_|gstatic\.com\/cloudsearch\/[^"')]*\/qicons/;
+  // The search box suggestions (cloudsearch qicons) and the input tools keyboard
+  // (inputtools ita_sprite) use grey sprites with no tone token.
+  const MONOCHROME_ICON = /gstatic\.com\/[^"')]*icons\/[^"')]*_(?:nv\d{3}|p900|black|grey\d{3}|gm_grey)_|gstatic\.com\/cloudsearch\/[^"')]*\/qicons|gstatic\.com\/inputtools\/images\/ita_sprite/;
 
   /* ---------- Color parsing ---------- */
 
