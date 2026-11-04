@@ -43,7 +43,8 @@
   const OVERRIDE_CLASS = 'fuksia-override';
   // Message bodies and the compose editor keep the email's own design: fuksia.css inverts
   // them as a block, so Gmail's rules inside them must not be remapped a second time.
-  const SKIP_SELECTOR = /\.a3s\b|\.ii\.gt\b|\.editable\b|gmail_(?:signature|quote)/;
+  // Gmail also copies each email's own CSS into the page, scoped under .msg-<id>.
+  const SKIP_SELECTOR = /\.a3s\b|\.ii\.gt\b|\.editable\b|gmail_(?:signature|quote)|\.msg-\d/;
   const ACCENT_HUE = 348;   // hue of #D85A74
   // Google encodes the tone in icon file names: nv700, p900, black, grey600... are dark,
   // single-color glyphs drawn for a light background.
