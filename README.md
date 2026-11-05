@@ -2,6 +2,8 @@
 
 Dark theme for Gmail with fuchsia accents, by BURU labs. Follows your system dark mode.
 
+**[Install from the Chrome Web Store](https://chrome.google.com/webstore/detail/mpleolmfndkkokmhlkgkdhgokghkecad)**
+
 Unlike filter-based dark modes, Fuksia does **not** invert the page:
 
 - Gmail's Material 3 color variables are redefined with a dark, fuchsia palette (`fuksia.css`).
@@ -15,7 +17,11 @@ Unlike filter-based dark modes, Fuksia does **not** invert the page:
 
 The palette lives at the top of `extension/fuksia.css` (`--fx-*` variables).
 
-## Install (developer mode)
+## Install
+
+From the [Chrome Web Store](https://chrome.google.com/webstore/detail/mpleolmfndkkokmhlkgkdhgokghkecad).
+
+### Developer mode
 
 1. Go to `chrome://extensions` and enable **Developer mode**.
 2. Click **Load unpacked** and select the `extension/` folder.
