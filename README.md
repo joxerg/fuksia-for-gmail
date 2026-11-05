@@ -4,6 +4,8 @@ Dark theme for Gmail with fuchsia accents, by BURU labs. Follows your system dar
 
 **[Install from the Chrome Web Store](https://chrome.google.com/webstore/detail/mpleolmfndkkokmhlkgkdhgokghkecad)**
 
+![Gmail inbox with Fuksia: dark theme, pink unread messages, outlined Compose button](store-assets/screenshot-inbox-1280x800.png)
+
 Unlike filter-based dark modes, Fuksia does **not** invert the page:
 
 - Gmail's Material 3 color variables are redefined with a dark, fuchsia palette (`fuksia.css`).
