@@ -36,4 +36,8 @@ The idea of telling Gmail's monochrome UI glyphs apart by the tone token in thei
 (`nv700`, `p900`, `grey600`...) comes from [Gmail Auto Dark Mode](https://github.com/renefs/gmail-auto-dark-mode)
 by Rene Fernandez (MIT).
 
+## License
+
+[MIT](LICENSE) © BURU labs
+
 Gmail is a trademark of Google LLC. This project is not affiliated with or endorsed by Google.
