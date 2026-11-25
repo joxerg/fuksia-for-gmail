@@ -175,6 +175,13 @@
     filter: hue-rotate(125deg) saturate(1.3) !important;
   }
 
+  /* "x" para quitar un adjunto al redactar: PNG negro sin token de tono. invert(0.77) lo
+     lleva al mismo gris que el tamaño del archivo (#c4c7c5). */
+  html body .vq {
+    filter: invert(0.77) !important;
+    opacity: 1 !important;
+  }
+
   /* Selector de fecha (programar envío, posponer): sábado y domingo con un sombreado sutil.
      Gmail define ese gris pero lo anula con una regla posterior; aquí se mantiene. */
   html body .J-JB-KA-JB:is(.J-JB-KA-a6O-Zj, .J-JB-KA-a6O-Zq) {
