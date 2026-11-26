@@ -5,15 +5,15 @@ title: Privacy Policy
 
 # Privacy Policy — Fuksia for Gmail
 
-**Last Updated: October 21, 2026**
+**Last Updated: November 26, 2026**
 
 Fuksia for Gmail is published by BURU labs.
 
 ## Data collection
 
 Fuksia for Gmail **collects no data of any kind**. It does not read, store or transmit email
-content, personal information, browsing activity or history. It uses no cookies or storage and
-does not communicate with any server of its own or any third party.
+content, personal information, browsing activity or history. It uses no cookies and does not
+communicate with any server of its own or any third party.
 
 Everything happens inside your browser: the extension reads the stylesheets Gmail has already
 loaded, writes dark-themed copies of their colors next to them, and checks your system's
@@ -21,9 +21,17 @@ color-scheme preference (`prefers-color-scheme`). The only network request it ma
 re-download, from Google's own servers, a stylesheet that Gmail itself has already loaded
 (the Google bar style, served cross-origin), in order to read its colors.
 
+## Settings
+
+The extension menu has two settings: dark theme on/off, and where Gmail's row actions are shown
+(default or left). Only these two values are stored, in Chrome's extension storage
+(`chrome.storage.sync`, which Chrome syncs between your own browsers if Chrome sync is on) and as
+a local copy in your browser for Gmail's page, so the page opens with the right setting. They
+never leave your browser or Chrome sync, and contain no personal information.
+
 ## Permissions
 
-The extension requests no permissions. It runs only on `mail.google.com` and on the Google apps
+The only permission requested is `storage`, to save the two settings above. It runs only on `mail.google.com` and on the Google apps
 Gmail embeds (Calendar, Keep, Tasks, Contacts, Chat, and the Google bar widgets) when they are
 shown inside Gmail.
 

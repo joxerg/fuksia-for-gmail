@@ -17,6 +17,17 @@ Unlike filter-based dark modes, Fuksia does **not** invert the page:
 - Side-panel apps (Calendar, Keep, Tasks, Contacts, Chat) get the same treatment when embedded in
   Gmail; opened in their own tab they are left untouched.
 
+## Settings
+
+Click the extension's toolbar icon:
+
+- **Dark theme**: on/off. On, it follows your system dark mode.
+- **Quick actions**: *Default* or *Left*. With *Left*, the Archive, Delete, Mark as read and
+  Snooze buttons that Gmail shows when you hover a message are drawn between the sender and the
+  subject instead of at the far right, and the date stays visible. Easier on large screens.
+
+Changes apply at once to open Gmail tabs. The settings are kept in `chrome.storage.sync`.
+
 The palette lives at the top of `extension/fuksia.css` (`--fx-*` variables).
 
 ## Install

@@ -19,6 +19,28 @@
 
   const darkQuery = window.matchMedia('(prefers-color-scheme: dark)');
 
+  /* ---------- Settings (extension menu) ----------
+   * dark: the theme on/off. Off, fuksia.css stops matching (data-fuksia-dark="off" on <html>)
+   *       and every stylesheet written here is switched off; nothing is removed, so turning it
+   *       back on is instant.
+   * actions: 'default' or 'left', where Gmail draws the row actions (Archive, Delete...).
+   * The settings live in chrome.storage.sync. Gmail's own frame also keeps a copy in
+   * localStorage, read synchronously here, so a page loaded with the theme off does not
+   * flash dark while chrome.storage answers.
+   */
+  const DEFAULTS = { dark: true, actions: 'default' };
+  const CACHE_KEY = 'fuksia-settings';
+  const settings = { ...DEFAULTS };
+  if (isTop) {
+    try {
+      Object.assign(settings, JSON.parse(localStorage.getItem(CACHE_KEY)) || {});
+    } catch (e) {
+      // no cache yet, or storage blocked
+    }
+  }
+  const active = () => settings.dark && darkQuery.matches;
+  const OFF = 'not all';
+
   // Side-panel frames do not get fuksia.css (it would also hit those apps in their own
   // tabs), so they receive the base palette from here.
   // Only the side-panel apps get a painted page background. The apps grid (ogs.google.com)
@@ -28,6 +50,7 @@
   if (!isTop) {
     const base = document.createElement('style');
     base.id = 'fuksia-base';
+    base.media = settings.dark ? 'all' : OFF;
     base.textContent = `@media (prefers-color-scheme: dark){:root{color-scheme:dark!important;accent-color:#D85A74;
       --gm3-sys-color-surface:#1b1b1c!important;--gm3-sys-color-surface-container-low:#1b1b1c!important;
       --gm3-sys-color-surface-container:#222224!important;--gm3-sys-color-surface-container-high:#2a2a2d!important;
@@ -381,7 +404,7 @@
       companion.className = OVERRIDE_CLASS;
       companions.set(node, companion);
     }
-    companion.media = darkQuery.matches ? 'all' : 'not all';
+    companion.media = active() ? 'all' : OFF;
     const css = out.join('\n');
     if (companion.textContent !== css) companion.textContent = css;
     if (node.nextSibling !== companion) node.after(companion);
@@ -442,12 +465,44 @@
     observer.observe(document.documentElement, { childList: true, subtree: true, characterData: true });
   };
 
-  // Follow the system theme live: companions are switched off rather than removed.
-  darkQuery.addEventListener('change', () => {
+  // Follow the system theme and the settings live: stylesheets are switched off rather than
+  // removed.
+  const applySettings = () => {
+    const root = document.documentElement;
+    if (settings.dark) root.removeAttribute('data-fuksia-dark');
+    else root.setAttribute('data-fuksia-dark', 'off');
+    if (settings.actions === 'left') root.setAttribute('data-fuksia-actions', 'left');
+    else root.removeAttribute('data-fuksia-actions');
     document.querySelectorAll('style.' + OVERRIDE_CLASS).forEach((s) => {
-      s.media = darkQuery.matches ? 'all' : 'not all';
+      s.media = active() ? 'all' : OFF;
     });
-  });
+    const base = document.getElementById('fuksia-base');
+    if (base) base.media = settings.dark ? 'all' : OFF;
+    if (isTop) {
+      try {
+        localStorage.setItem(CACHE_KEY, JSON.stringify(settings));
+      } catch (e) {
+        // storage blocked: only the first paint is affected
+      }
+    }
+  };
+  darkQuery.addEventListener('change', applySettings);
+  applySettings();
+  try {
+    chrome.storage.sync.get(DEFAULTS).then((stored) => {
+      Object.assign(settings, stored);
+      applySettings();
+    });
+    chrome.storage.onChanged.addListener((changes, area) => {
+      if (area !== 'sync') return;
+      for (const key of Object.keys(DEFAULTS)) {
+        if (changes[key]) settings[key] = changes[key].newValue ?? DEFAULTS[key];
+      }
+      applySettings();
+    });
+  } catch (e) {
+    // extension reloaded or storage unavailable: keep the cached settings
+  }
 
   /* ---------- Workspace logo ----------
    * Organizations upload their logo as an image with a white background (Workspace does not
@@ -491,7 +546,7 @@
     });
     const style = document.createElement('style');
     style.className = OVERRIDE_CLASS;
-    style.media = darkQuery.matches ? 'all' : 'not all';
+    style.media = active() ? 'all' : OFF;
     style.textContent = `html body ${LOGO_SELECTOR}{content:url("${url}")!important}`;
     document.documentElement.appendChild(style);
   };

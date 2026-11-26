@@ -1,23 +1,42 @@
 {
   "manifest_version": 3,
   "name": "Fuksia for Gmail",
-  "version": "0.1.5",
+  "version": "0.2.0",
   "author": "BURU labs",
-  "description": "Dark theme for Gmail with fuchsia accents, without inverting the page. Follows your system dark mode.",
+  "description": "Dark theme for Gmail with fuchsia accents, without inverting the page. Optional: row actions on the left.",
   "icons": {
     "16": "icons/icon16.png",
     "48": "icons/icon48.png",
     "128": "icons/icon128.png"
   },
+  "action": {
+    "default_title": "Fuksia for Gmail",
+    "default_popup": "popup.html"
+  },
+  "options_ui": {
+    "page": "popup.html",
+    "open_in_tab": false
+  },
+  "permissions": [
+    "storage"
+  ],
   "content_scripts": [
     {
-      "matches": ["https://mail.google.com/*"],
-      "css": ["fuksia.css"],
+      "matches": [
+        "https://mail.google.com/*"
+      ],
+      "css": [
+        "fuksia.css"
+      ],
       "run_at": "document_start"
     },
     {
-      "matches": ["https://mail.google.com/*"],
-      "js": ["fuksia.js"],
+      "matches": [
+        "https://mail.google.com/*"
+      ],
+      "js": [
+        "fuksia.js"
+      ],
       "run_at": "document_start",
       "all_frames": true,
       "match_about_blank": true
@@ -31,7 +50,9 @@
         "https://chat.google.com/*",
         "https://ogs.google.com/*"
       ],
-      "js": ["fuksia.js"],
+      "js": [
+        "fuksia.js"
+      ],
       "run_at": "document_start",
       "all_frames": true
     }
