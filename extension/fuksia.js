@@ -488,6 +488,21 @@
   };
   darkQuery.addEventListener('change', applySettings);
   applySettings();
+
+  // Quick actions on the left: Gmail marks the hovered row with .aqw and removes it on the
+  // row's mouseout, except when the pointer leaves from one of the action buttons. At the
+  // right edge that almost never happens; next to the sender the pointer often goes straight
+  // from a button to the next row, and the old row kept its buttons on screen. Any row still
+  // marked while the pointer is elsewhere is unmarked here (only the class, Gmail's state
+  // for the row is otherwise untouched).
+  if (isTop) {
+    document.addEventListener('mouseover', () => {
+      if (settings.actions !== 'left') return;
+      for (const row of document.querySelectorAll('tr.zA.aqw')) {
+        if (!row.matches(':hover')) row.classList.remove('aqw');
+      }
+    }, { capture: true, passive: true });
+  }
   try {
     chrome.storage.sync.get(DEFAULTS).then((stored) => {
       Object.assign(settings, stored);
