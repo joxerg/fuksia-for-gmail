@@ -23,8 +23,9 @@ Click the extension's toolbar icon:
 
 - **Dark theme**: on/off. On, it follows your system dark mode.
 - **Quick actions**: *Default* or *Left*. With *Left*, the Archive, Delete, Mark as read and
-  Snooze buttons that Gmail shows when you hover a message are drawn between the sender and the
-  subject instead of at the far right, and the date stays visible. Easier on large screens.
+  Snooze buttons that Gmail shows when you hover a message are drawn over the sender, at the
+  start of the row, instead of at the far right. The subject and the date stay visible. Easier
+  on large screens.
 
 Changes apply at once to open Gmail tabs. The settings are kept in `chrome.storage.sync`.
 

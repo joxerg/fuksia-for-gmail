@@ -248,20 +248,20 @@
 /* ---------- Acciones rápidas a la izquierda (opción "Left" del menú de la extensión) ----------
    Al pasar el ratón por un correo, Gmail esconde la fecha y muestra Archivar, Eliminar, Marcar
    como leído y Posponer al final de la fila. Con data-fuksia-actions="left" en <html>, esos
-   mismos botones se colocan encima del principio del asunto, justo detrás del remitente, y la
-   fecha sigue visible. Son los botones de Gmail: solo cambia dónde se dibujan.
+   mismos botones se colocan encima del remitente, al principio de la fila: el asunto sigue
+   visible, y también la fecha. Son los botones de Gmail: solo cambia dónde se dibujan.
    La fila de Gmail es flex y position: relative; la celda de los botones se saca del flujo y se
-   ancla al borde izquierdo de la celda del asunto (anchor-scope deja un ancla por fila). Solo
+   ancla al borde izquierdo de la celda del remitente (anchor-scope deja un ancla por fila). Solo
    en filas de una línea, las que tienen celda de asunto (.a4W). Funciona con y sin tema oscuro. */
 html[data-fuksia-actions="left"] tr.zA:has(> td.a4W) {
-  anchor-scope: --fx-subject;
+  anchor-scope: --fx-sender;
 }
-html[data-fuksia-actions="left"] tr.zA > td.a4W {
-  anchor-name: --fx-subject;
+html[data-fuksia-actions="left"] tr.zA > td.yX {
+  anchor-name: --fx-sender;
 }
 html[data-fuksia-actions="left"] tr.zA:is(.aqw, .buL, .cP):has(> td.a4W) > td.bq4 {
   position: absolute !important;
-  position-anchor: --fx-subject;
+  position-anchor: --fx-sender;
   left: anchor(left);
   top: anchor(top);
   bottom: anchor(bottom);
@@ -269,7 +269,7 @@ html[data-fuksia-actions="left"] tr.zA:is(.aqw, .buL, .cP):has(> td.a4W) > td.bq
   padding: 0 8px 0 0 !important;
   align-items: center;
   z-index: 2;
-  /* Fondo opaco para tapar el asunto: el de la fila (leídos y seleccionados lo tienen opaco)
+  /* Fondo opaco para tapar el remitente: el de la fila (leídos y seleccionados lo tienen opaco)
      o el de la página en los no leídos, que no llevan fondo propio. */
   background-color: inherit;
 }
